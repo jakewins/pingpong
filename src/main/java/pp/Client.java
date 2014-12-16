@@ -57,11 +57,11 @@ public class Client
     {
         if(args.length != 4)
         {
-            System.out.println("Usage: java -jar client.jar <serializer> <transport> <host:port> <secondstorun>");
+            System.out.println("Usage: java -jar ping.jar <transport> <serializer> <host:port> <runtimeseconds>");
             return;
         }
-        Serialization serialization = Serialization.valueOf( args[0].toUpperCase() );
-        Transport transport = Transports.valueOf( args[1].toUpperCase() );
+        Transport transport = Transports.valueOf( args[0].toUpperCase() );
+        Serialization serialization = Serialization.valueOf( args[1].toUpperCase() );
         new Client( transport, serialization, args[2].split( ":" )[0], parseInt( args[2].split( ":" )[1] ),
                 Long.valueOf( args[3] ) ).run();
     }

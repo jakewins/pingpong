@@ -50,8 +50,8 @@ public class OIOConnection implements Transport.Connection
             serverCh.configureBlocking( true );
             return new OIOConnection(
                 serverCh.accept(),
-                sers.newSerializer(),
-                sers.newDeserializer());
+                sers.newServerSerializer(),
+                sers.newServerDeserializer());
         }
     }
 
@@ -59,8 +59,8 @@ public class OIOConnection implements Transport.Connection
     {
         return new OIOConnection(
                 SocketChannel.open( new InetSocketAddress( host, port ) ),
-                sers.newSerializer(),
-                sers.newDeserializer());
+                sers.newClientSerializer(),
+                sers.newClientDeserializer());
     }
 
 

@@ -27,7 +27,7 @@ import uk.co.real_logic.sbe.codec.java.DirectBuffer;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class SBESmall
+public class SBEStmtResponse
 {
     public static class Ser implements Serializer
     {
@@ -45,7 +45,7 @@ public class SBESmall
 
     public static class Des implements Deserializer
     {
-        private final DirectBuffer directBuffer = new DirectBuffer(new byte[0]);
+        private final DirectBuffer directBuffer = new DirectBuffer( new byte[0] );
         private final SimpleMessage simpleMessage = new SimpleMessage();
         private final int blockLength = simpleMessage.sbeBlockLength();
         private final int schemaVersion = simpleMessage.sbeSchemaVersion();

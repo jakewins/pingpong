@@ -26,6 +26,7 @@ import java.io.IOException;
 
 public enum Transports implements Transport
 {
+    /** Old IO, simple blocking sockets. */
     OIO
     {
         @Override

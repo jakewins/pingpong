@@ -24,6 +24,5 @@ import java.nio.ByteBuffer;
 
 public interface Serializer
 {
-    /** Serialize a message with the given message id, return the size */
     int serialize( long id, ByteBuffer outBuf ) throws IOException;
 }

@@ -19,16 +19,30 @@
  */
 package pp.serialization.vanilla;
 
+import pp.serialization.Deserializer;
 import pp.serialization.Serializer;
 
 import java.nio.ByteBuffer;
 
-public class VanillaSerializer implements Serializer
+/** Meant to be used as a ping/pong baseline */
+public class Vanilla
 {
-    @Override
-    public int serialize( long id, ByteBuffer outBuf )
+    public static class Des implements Deserializer
     {
-        outBuf.putLong( id );
-        return 8;
+        @Override
+        public long deserialize( int size, ByteBuffer buffer )
+        {
+            return buffer.getLong();
+        }
+    }
+
+    public static class Ser implements Serializer
+    {
+        @Override
+        public int serialize( long id, ByteBuffer outBuf )
+        {
+            outBuf.putLong( id );
+            return 8;
+        }
     }
 }

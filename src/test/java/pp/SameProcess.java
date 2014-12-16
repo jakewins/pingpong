@@ -27,7 +27,7 @@ import java.io.IOException;
 public class SameProcess
 {
     private static final Transports transport = Transports.OIO;
-    private static final Serialization serialization = Serialization.MSGPACK_SMALL;
+    private static final Serialization serialization = Serialization.MSGPACK_STMT_RESPONSE;
 
     public static void main(String ... args) throws InterruptedException
     {
@@ -38,7 +38,7 @@ public class SameProcess
             {
                 try
                 {
-                    Server.main( serialization.name(), transport.name() );
+                    Server.main( transport.name(), serialization.name() );
                 }
                 catch ( IOException e )
                 {
@@ -47,21 +47,21 @@ public class SameProcess
             }
         } );
         server.start();
-        Thread client = new Thread( new Runnable()
+        Thread client = new Thread(  new Runnable()
         {
             @Override
             public void run()
             {
                 try
                 {
-                    Client.main( serialization.name(), transport.name(), "localhost:7474", "10" );
+                    Client.main( transport.name(), serialization.name(), "localhost:7474", "30" );
                 }
                 catch ( IOException e )
                 {
                     throw new RuntimeException( e );
                 }
             }
-        } );
+        });
         client.start();
 
         client.join();

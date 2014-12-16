@@ -46,12 +46,12 @@ public class Server
     {
         if(args.length != 2)
         {
-            System.out.println("Usage: java -jar server.jar <serializer> <transport>");
+            System.out.println("Usage: java -jar pong.jar <transport> <serializer>");
             return;
         }
 
-        Serialization serialization = Serialization.valueOf( args[0].toUpperCase() );
-        Transport trans = Transports.valueOf( args[1].toUpperCase() );
+        Transport trans = Transports.valueOf( args[0].toUpperCase() );
+        Serialization serialization = Serialization.valueOf( args[1].toUpperCase() );
 
         new Server( trans, serialization, "0.0.0.0", 7474 ).run();
     }
@@ -69,9 +69,19 @@ public class Server
 
     private void serve( Connection conn ) throws IOException
     {
+        long currentId = 0;
         while ( true )
         {
             long id = conn.recieve();
+            if(id != currentId)
+            {
+                System.out.println("ERR: Out of sequence id, " + id);
+                return;
+            }
+            else
+            {
+                currentId++;
+            }
             conn.send( id );
         }
     }

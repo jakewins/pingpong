@@ -20,8 +20,10 @@
 package pp.serialization;
 
 import pp.serialization.msgpack.MsgPackSmall;
-import pp.serialization.vanilla.VanillaDeserializer;
-import pp.serialization.vanilla.VanillaSerializer;
+import pp.serialization.msgpack.MsgPackStmtResponse;
+import pp.serialization.sbe.SBESmall;
+import pp.serialization.sbe.SBEStmtResponse;
+import pp.serialization.vanilla.Vanilla;
 
 public enum Serialization
 {
@@ -31,36 +33,62 @@ public enum Serialization
      */
     VANILLA
     {
-        @Override
-        public Serializer newSerializer()
+        @Override public Serializer newClientSerializer()
         {
-            return new VanillaSerializer();
+            return new Vanilla.Ser();
         }
-
-        @Override
-        public Deserializer newDeserializer()
+        @Override public Deserializer newClientDeserializer()
         {
-            return new VanillaDeserializer();
+            return new Vanilla.Des();
+        }
+        @Override public Serializer newServerSerializer()
+        {
+            return new Vanilla.Ser();
+        }
+        @Override public Deserializer newServerDeserializer()
+        {
+            return new Vanilla.Des();
         }
     },
 
     MSGPACK_SMALL
     {
-        @Override
-        public Serializer newSerializer()
-        {
-            return new MsgPackSmall.Ser();
-        }
+        @Override public Serializer newClientSerializer() { return new MsgPackSmall.Ser(); }
+        @Override public Deserializer newClientDeserializer() { return new MsgPackSmall.Des(); }
+        @Override public Serializer newServerSerializer() { return new MsgPackSmall.Ser(); }
+        @Override public Deserializer newServerDeserializer() { return new MsgPackSmall.Des(); }
+    },
 
-        @Override
-        public Deserializer newDeserializer()
-        {
-            return new MsgPackSmall.Des();
-        }
-    };
+    MSGPACK_STMT_RESPONSE
+    {
+        @Override public Serializer newClientSerializer() { return new MsgPackStmtResponse.Client.Ser(); }
+        @Override public Deserializer newClientDeserializer() { return new MsgPackStmtResponse.Client.Des(); }
+        @Override public Serializer newServerSerializer() { return new MsgPackStmtResponse.Server.Ser(); }
+        @Override public Deserializer newServerDeserializer() { return new MsgPackStmtResponse.Server.Des(); }
+    },
 
-    public abstract Serializer newSerializer();
-    public abstract Deserializer newDeserializer();
+    SBE_SMALL
+    {
+        @Override public Serializer newClientSerializer() { return new SBESmall.Ser(); }
+        @Override public Deserializer newClientDeserializer() { return new SBESmall.Des(); }
+        @Override public Serializer newServerSerializer() { return new SBESmall.Ser(); }
+        @Override public Deserializer newServerDeserializer() { return new SBESmall.Des(); }
+    },
+
+    SBE_STMT_RESPONSE
+    {
+        @Override public Serializer newClientSerializer() { return new SBEStmtResponse.Ser(); }
+        @Override public Deserializer newClientDeserializer() { return new SBEStmtResponse.Des(); }
+        @Override public Serializer newServerSerializer() { return new SBEStmtResponse.Ser(); }
+        @Override public Deserializer newServerDeserializer() { return new SBEStmtResponse.Des(); }
+    }
+
+    ;
+
+    public abstract Serializer newClientSerializer();
+    public abstract Serializer newServerSerializer();
+    public abstract Deserializer newClientDeserializer();
+    public abstract Deserializer newServerDeserializer();
 
     @Override
     public String toString()
