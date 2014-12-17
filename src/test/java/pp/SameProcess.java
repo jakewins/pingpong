@@ -27,7 +27,7 @@ import java.io.IOException;
 public class SameProcess
 {
     private static final Transports transport = Transports.OIO;
-    private static final Serialization serialization = Serialization.MSGPACK_STMT_RESPONSE;
+    private static final Serialization serialization = Serialization.VANILLA;
 
     public static void main(String ... args) throws InterruptedException
     {

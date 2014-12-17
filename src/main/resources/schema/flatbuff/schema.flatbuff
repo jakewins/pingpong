@@ -1,0 +1,69 @@
+namespace pp.flatbuf;
+
+//enum Color : byte { Red = 1, Green, Blue }
+//
+//union Any { Monster }
+//
+//struct Vec3 {
+//  x:float;
+//  y:float;
+//  z:float;
+//}
+//
+//table Monster {
+//  pos:Vec3;
+//  mana:short = 150;
+//  hp:short = 100;
+//  name:string;
+//  friendly:bool = false (deprecated, priority: 1);
+//  inventory:[ubyte];
+//  color:Color = Blue;
+//  test:Any;
+//}
+
+table NString
+{
+  value:string;
+}
+
+table NInteger
+{
+  value:long;
+}
+
+table NCollection
+{
+  value:[NString];
+}
+
+union Value
+{
+  NString, NInteger, NCollection
+}
+
+table Property
+{
+  key:string;
+  value:Value;
+}
+
+table Node
+{
+  id:string;
+  label:string;
+  properties:[Property];
+}
+
+table Row
+{
+  cells:[Node];
+}
+
+table Statement
+{
+  query:string;
+  params:Value;
+}
+
+
+root_type Row;

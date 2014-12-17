@@ -20,7 +20,9 @@
 package pp.serialization.msgpack;
 
 import org.msgpack.MessagePack;
-import org.msgpack.packer.BufferPacker;
+import org.msgpack.packer.Packer;
+import org.msgpack.unpacker.BufferUnpacker;
+import pp.infrastructure.BBMsgPacker;
 import pp.message.StmtResponse;
 import pp.serialization.Deserializer;
 import pp.serialization.Serializer;
@@ -38,11 +40,12 @@ public class MsgPackStmtResponse
         public static class Ser implements Serializer
         {
             private final MessagePack msgpack = new MessagePack();
+            private final BBMsgPacker packer = new BBMsgPacker(msgpack);
 
             @Override
             public int serialize( long id, ByteBuffer outBuf ) throws IOException
             {
-                BufferPacker packer = msgpack.createBufferPacker();
+                packer.wrap( outBuf );
                 packer.write( id );
 
                 packer.writeArrayBegin( StmtResponse.RESULT.length );
@@ -52,12 +55,10 @@ public class MsgPackStmtResponse
                 }
                 packer.writeArrayEnd();
 
-                byte[] write = packer.toByteArray();
-                outBuf.put( write );
-                return write.length;
+                return outBuf.position();
             }
 
-            private void serializeRow( BufferPacker packer, Object[] row ) throws IOException
+            private void serializeRow( Packer packer, Object[] row ) throws IOException
             {
                 packer.writeArrayBegin( row.length );
                 for ( int j = 0; j < row.length; j++ )
@@ -73,7 +74,7 @@ public class MsgPackStmtResponse
                         {
                             Pair<String,Object> prop = n.properties[i];
                             packer.write( prop.a );
-                            packer.write( prop.b );
+                            serializeCell( packer, prop.b );
                         }
                         packer.writeMapEnd();
                     }
@@ -84,16 +85,39 @@ public class MsgPackStmtResponse
                 }
                 packer.writeArrayEnd();
             }
+
+            private void serializeCell( Packer packer, Object val ) throws IOException
+            {
+                if(val instanceof String)
+                {
+                    packer.write( (String)val );
+                }
+                else if(val instanceof Integer)
+                {
+                    packer.write( (Integer)val );
+                }
+                else if(val.getClass().isArray())
+                {
+                    Object[] arr = (Object[])val;
+                    packer.writeArrayBegin( arr.length );
+                    for ( int i = 0; i < arr.length; i++ )
+                    {
+                        serializeCell( packer, arr[i] );
+                    }
+                    packer.writeArrayEnd();
+                }
+            }
         }
 
         public static class Des implements Deserializer
         {
             private final MessagePack msgpack = new MessagePack();
+            private final BufferUnpacker unpacker = msgpack.createBufferUnpacker();
 
             @Override
             public long deserialize( int size, ByteBuffer buffer ) throws IOException
             {
-                return msgpack.createBufferUnpacker( buffer ).readLong();
+                return unpacker.wrap( buffer ).readLong();
             }
         }
     }
@@ -103,14 +127,15 @@ public class MsgPackStmtResponse
         public static class Ser implements Serializer
         {
             private final MessagePack msgpack = new MessagePack();
+            private final BBMsgPacker packer = new BBMsgPacker(msgpack);
 
             @Override
             public int serialize( long id, ByteBuffer outBuf ) throws IOException
             {
-                BufferPacker packer = msgpack.createBufferPacker();
+                packer.wrap( outBuf );
                 packer
-                        .write( id )
-                        .write( StmtResponse.QUERY );
+                    .write( id )
+                    .write( StmtResponse.QUERY );
 
                 packer.writeArrayBegin( StmtResponse.PARAMS.length );
                 for ( int i = 0; i < StmtResponse.PARAMS.length; i++ )
@@ -118,21 +143,19 @@ public class MsgPackStmtResponse
                     packer.write( StmtResponse.PARAMS[i] );
                 }
                 packer.writeArrayEnd();
-
-                byte[] write = packer.toByteArray();
-                outBuf.put( write );
-                return write.length;
+                return outBuf.position();
             }
         }
 
         public static class Des implements Deserializer
         {
             private final MessagePack msgpack = new MessagePack();
+            private final BufferUnpacker unpacker = msgpack.createBufferUnpacker();
 
             @Override
             public long deserialize( int size, ByteBuffer buffer ) throws IOException
             {
-                return msgpack.createBufferUnpacker( buffer ).readLong();
+                return unpacker.wrap( buffer ).readLong();
             }
         }
     }

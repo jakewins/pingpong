@@ -20,41 +20,89 @@
 package pp.serialization.sbe;
 
 import baseline.SimpleMessage;
+import baseline.Statement;
+import pp.message.StmtResponse;
 import pp.serialization.Deserializer;
 import pp.serialization.Serializer;
 import uk.co.real_logic.sbe.codec.java.DirectBuffer;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 public class SBEStmtResponse
 {
-    public static class Ser implements Serializer
+    // NOTE: This is not completed. I could not find a sensible way, that didn't include including serialized things
+    // inside serialized SBE messages to handle complex structures like recursive maps.
+    public static class Server
     {
-        private final DirectBuffer directBuffer = new DirectBuffer(new byte[0]);
-        private final SimpleMessage SIMPLE_MESSAGE = new SimpleMessage();
-
-        @Override
-        public int serialize( long id, ByteBuffer outBuf ) throws IOException
+        public static class Ser implements Serializer
         {
-            directBuffer.wrap( outBuf );
-            SIMPLE_MESSAGE.wrapForEncode( directBuffer, 0 ).id( id );
-            return SIMPLE_MESSAGE.size();
+            private final DirectBuffer directBuffer = new DirectBuffer( new byte[0] );
+            private final SimpleMessage SIMPLE_MESSAGE = new SimpleMessage();
+
+            @Override
+            public int serialize( long id, ByteBuffer outBuf ) throws IOException
+            {
+                directBuffer.wrap( outBuf );
+                SIMPLE_MESSAGE.wrapForEncode( directBuffer, 0 ).id( id );
+                return SIMPLE_MESSAGE.size();
+            }
+        }
+
+        public static class Des implements Deserializer
+        {
+            private final DirectBuffer directBuffer = new DirectBuffer( new byte[0] );
+            private final Statement stmt = new Statement();
+            private final int blockLength = stmt.sbeBlockLength();
+            private final int schemaVersion = stmt.sbeSchemaVersion();
+
+            @Override
+            public long deserialize( int size, ByteBuffer buffer ) throws IOException
+            {
+                directBuffer.wrap( buffer );
+                return stmt.wrapForDecode( directBuffer, 0, blockLength, schemaVersion ).id();
+            }
         }
     }
 
-    public static class Des implements Deserializer
+    public static class Client
     {
-        private final DirectBuffer directBuffer = new DirectBuffer( new byte[0] );
-        private final SimpleMessage simpleMessage = new SimpleMessage();
-        private final int blockLength = simpleMessage.sbeBlockLength();
-        private final int schemaVersion = simpleMessage.sbeSchemaVersion();
-
-        @Override
-        public long deserialize( int size, ByteBuffer buffer ) throws IOException
+        public static class Ser implements Serializer
         {
-            directBuffer.wrap( buffer );
-            return simpleMessage.wrapForDecode( directBuffer, 0, blockLength, schemaVersion ).id();
+            private final DirectBuffer directBuffer = new DirectBuffer( new byte[0] );
+            private final Statement stmt = new Statement();
+
+            @Override
+            public int serialize( long id, ByteBuffer outBuf ) throws IOException
+            {
+                if(true) throw new UnsupportedOperationException( "Not yet implemented." );
+                final int srcOffset = 0;
+
+                directBuffer.wrap( outBuf );
+
+                stmt.wrapForEncode( directBuffer, 0 )
+                        .id( id );
+
+                byte[] query = StmtResponse.QUERY.getBytes( StandardCharsets.UTF_8 );
+                stmt.putQuery( query, srcOffset, query.length );
+                return stmt.size();
+            }
+        }
+
+        public static class Des implements Deserializer
+        {
+            private final DirectBuffer directBuffer = new DirectBuffer( new byte[0] );
+            private final SimpleMessage simpleMessage = new SimpleMessage();
+            private final int blockLength = simpleMessage.sbeBlockLength();
+            private final int schemaVersion = simpleMessage.sbeSchemaVersion();
+
+            @Override
+            public long deserialize( int size, ByteBuffer buffer ) throws IOException
+            {
+                directBuffer.wrap( buffer );
+                return simpleMessage.wrapForDecode( directBuffer, 0, blockLength, schemaVersion ).id();
+            }
         }
     }
 }

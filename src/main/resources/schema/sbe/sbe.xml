@@ -26,8 +26,16 @@
         <field name="id" id="1" type="uint64"/>
     </sbe:message>
 
-    <sbe:message name="SimpleMessage" id="1" description="Message containing only the message id">
+    <sbe:message name="Statement" id="2" description="Message containing a statement">
         <field name="id" id="1" type="uint64"/>
+        <group name="params" id="2" dimensionType="groupSizeEncoding">
+            <!--A this point, I'm taking a break from SBE - its awesome for small simple messages, but for these
+                messages that contain arbitrary maps.. its very restrictive. Since strings cannot be in groups, and
+                since strings need to be at the end of messages, it becomes very odd to serialize collections and other
+                more complex structures. -->
+            <field name="param" id="3" type="uint64" />
+        </group>
+        <data name="query" id="4" type="varDataEncoding" />
     </sbe:message>
 
 

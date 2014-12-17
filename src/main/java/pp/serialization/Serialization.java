@@ -22,7 +22,6 @@ package pp.serialization;
 import pp.serialization.msgpack.MsgPackSmall;
 import pp.serialization.msgpack.MsgPackStmtResponse;
 import pp.serialization.sbe.SBESmall;
-import pp.serialization.sbe.SBEStmtResponse;
 import pp.serialization.vanilla.Vanilla;
 
 public enum Serialization
@@ -75,13 +74,15 @@ public enum Serialization
         @Override public Deserializer newServerDeserializer() { return new SBESmall.Des(); }
     },
 
-    SBE_STMT_RESPONSE
-    {
-        @Override public Serializer newClientSerializer() { return new SBEStmtResponse.Ser(); }
-        @Override public Deserializer newClientDeserializer() { return new SBEStmtResponse.Des(); }
-        @Override public Serializer newServerSerializer() { return new SBEStmtResponse.Ser(); }
-        @Override public Deserializer newServerDeserializer() { return new SBEStmtResponse.Des(); }
-    }
+
+    // Was not able to implement this in a sensible way with SBE
+//    SBE_STMT_RESPONSE
+//    {
+//        @Override public Serializer newClientSerializer() { return new SBEStmtResponse.Client.Ser(); }
+//        @Override public Deserializer newClientDeserializer() { return new SBEStmtResponse.Client.Des(); }
+//        @Override public Serializer newServerSerializer() { return new SBEStmtResponse.Server.Ser(); }
+//        @Override public Deserializer newServerDeserializer() { return new SBEStmtResponse.Server.Des(); }
+//    }
 
     ;
 
